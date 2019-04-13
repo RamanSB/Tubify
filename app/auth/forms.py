@@ -1,8 +1,33 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Apr 13 14:20:11 2019
+from flask_wtf import FlaskForm
+from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms.validators import DataRequired, EqualTo, Email, ValidationError, Length
+from app.models import User
 
-@author: RamanSB
-"""
 
+class LoginForm(FlaskForm):
+    username = StringField('username', validators=[DataRequired()])
+    password = PasswordField('password', validators=[DataRequired()])
+    remember_me = BooleanField('Remember Me')
+    submit = SubmitField('Sign In')
+    
+    
+class RegistrationForm(FlaskForm):
+    username = StringField('username', validators=[DataRequired()])
+    email = StringField('email', validators=[Email(), DataRequired()])
+    password = PasswordField('password', validators=[DataRequired()])
+    password2 = PasswordField('repeat password', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Register')
+    
+    
+    def validate_username(self, username):
+        user = User.query.filter_by(username=username.data).first()
+        if user is not None:
+            raise ValidationError("User already exists. Please choose another username.")
+    
+    def validate_email(self, email):
+        user = User.query.filter_by(email=email.data).first()
+        if user is not None:
+            raise ValidationError("Email is in use. Please choose another email address.")
+        
+                                                
+    

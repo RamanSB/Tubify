@@ -36,6 +36,12 @@ from app import db, login
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 
+#Association table for MANY-MANY relationship between Playlist(s) and Song(s)
+playlists_songs = db.Table('playlists_songs',
+        db.Column('playlist_id', db.Integer, db.ForeignKey('playlist.id'), primary_key=True),
+        db.Column('song_id', db.Integer, db.ForeignKey('song.id'), primary_key=True)
+    )
+
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -53,6 +59,7 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
     
+    
 #Load user function (Required for: )
 @login.user_loader
 def load_user(id):
@@ -60,7 +67,7 @@ def load_user(id):
 
 class Song(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(120), index=True)
+    title = db.Column(db.String(128), index=True)
     artist_id = db.Column(db.Integer, index=True)
     #length = db.Column(db.) Not sure do I use datetime or just String.
 
@@ -80,17 +87,9 @@ class Playlist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(64), index=True, unique=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    songs = db.relationship('Song', secondary=playlist_songs, 
+    songs = db.relationship('Song', secondary=playlists_songs, 
                             lazy='subquery', 
                             backref=db.backref('host_playlist',lazy=True))
 
     def __repr__(self):
         return f"<Playlist: {self.title}>"
-
-
-#Association table for MANY-MANY relationship between Playlist(s) and Song(s)
-playlists_songs = db.Table('playlists_songs',
-        db.Column('playlist_id', db.Integer, db.ForeignKey('playlist.id'), primary_key=True),
-        db.Column('song_id', db.Integer, db.ForeignKey('song.id'), primary_key=True)
-        )
-

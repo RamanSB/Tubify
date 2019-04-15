@@ -1,8 +1,16 @@
 {% extends "base.html" %}
 
 {% block app_content%}
-
-
-
+    
+    <center>
+    <h2>Search</h2>
+    <form action="", method="post">
+        {{ form.hidden_tag() }}
+        <p>
+        {{ form.search(size=100) }}<br>
+        </p>
+    </form>
+    </center>
+    <br>
 
 {% endblock %}

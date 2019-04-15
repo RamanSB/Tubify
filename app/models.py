@@ -35,6 +35,8 @@ Relationships:
 from app import db, login
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from flask import current_app
+import requests
 
 #Association table for MANY-MANY relationship between Playlist(s) and Song(s)
 playlists_songs = db.Table('playlists_songs',
@@ -58,6 +60,26 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+    
+    
+    #https://accounts.spotify.com/authorize?client_id=5fe01282e44241328a84e7c5cc169165
+    #&response_type=code&redirect_uri=https%3A%2F%2Fexample.com%2Fcallback&scope=user-read-private%20user-read-email&state=34fFs29kd09
+    def spotify_authorize_user(self):
+        print("Spotify - Authorize End Point")
+        myparams = {'client_id':current_app.config['SPOTIFY_CLIENT_ID'],
+                    'response_type':'code',
+                    'redirect_uri':'0.0.0.0:5000/index'}
+        request = requests.get(current_app.config['SPOTIFY_AUTHORIZE_ENDPOINT'], params=myparams)
+        print(request.json())
+    
+    #https://api.spotify.com/v1/search?q=name:abacab&type=album,track (query string)
+    def spotify_search_song(self, song_name):
+        print("Spotify - Search Song End Point")
+        myparams = {'type':'track'}
+        myparams['q']=song_name
+        request = requests.get(current_app.config['SPOTIFY_SEARCH_ENDPOINT'], params=myparams)
+        
+        
     
     
 #Load user function (Required for: )

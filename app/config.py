@@ -20,6 +20,12 @@ class Config():
      'sqlite:///' + os.path.join(basedir, 'app.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
+    #Spotify API End-points
+    SPOTIFY_CLIENT_ID = "5672cca96bb442979a52f9e5d9f2c71e"
+    SPOTIFY_AUTHORIZE_ENDPOINT = "https://accounts.spotify.com/authorize"
+    SPOTIFY_SEARCH_ENDPOINT = "https://api.spotify.com/v1/search"
+    
+    
     
 
     

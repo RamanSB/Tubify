@@ -34,7 +34,7 @@ Relationships:
 
 from app import db, login
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import UserMixin
+from flask_login import UserMixin, current_user
 from flask import current_app
 import requests
 
@@ -51,6 +51,8 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(64), index=True, unique=True)
     password_hash = db.Column(db.String(128))
     playlists = db.relationship('Playlist', backref='creator', lazy='dynamic')
+    spotify_token = db.relationship('SpotifyToken', backref="token_owner", uselist=False, lazy=True)
+    
     
     def __repr__(self):
         return f"<User: {self.username}>"
@@ -68,17 +70,25 @@ class User(UserMixin, db.Model):
         print("Spotify - Authorize End Point")
         myparams = {'client_id':current_app.config['SPOTIFY_CLIENT_ID'],
                     'response_type':'code',
-                    'redirect_uri':'0.0.0.0:5000/index'}
-        request = requests.get(current_app.config['SPOTIFY_AUTHORIZE_ENDPOINT'], params=myparams)
-        print(request.json())
+                    'redirect_uri':'http://0.0.0.0:5000/index'}
+        response = requests.get(current_app.config['SPOTIFY_AUTHORIZE_ENDPOINT'], params=myparams)
+        print(response.url)
+        return response
     
+
     #https://api.spotify.com/v1/search?q=name:abacab&type=album,track (query string)
     def spotify_search_song(self, song_name):
         print("Spotify - Search Song End Point")
         myparams = {'type':'track'}
         myparams['q']=song_name
-        request = requests.get(current_app.config['SPOTIFY_SEARCH_ENDPOINT'], params=myparams)
+        response = requests.get(current_app.config['SPOTIFY_SEARCH_ENDPOINT'], params=myparams)
+        return response
         
+    def set_spotify_access_token(self, access_token):
+        spotify_token = access_token
+        st = SpotifyToken(token=access_token, token_owner=self)
+        db.session.add(st)
+        db.session.add(self)
         
     
     
@@ -115,3 +125,9 @@ class Playlist(db.Model):
 
     def __repr__(self):
         return f"<Playlist: {self.title}>"
+
+
+class SpotifyToken(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    token = db.Column(db.Text)

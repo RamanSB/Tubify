@@ -1,16 +1,43 @@
 {% extends "base.html" %}
 
 {% block app_content%}
+
+
+<div class="container">
+
+    <div class="row align-item-center">
+        <div class="col-md-12" align="center">
+            <h2>Search</h2>
+        </div>
+    </div>
+       
+    <div class="row align-items-center">
     
-    <center>
-    <h2>Search</h2>
-    <form action="", method="post">
-        {{ form.hidden_tag() }}
-        <p>
-        {{ form.search(size=100) }}<br>
-        </p>
-    </form>
-    </center>
-    <br>
+        <div class="col-md-1">
+        <!--Button goes here-->
+          <a href="{{ url_for('auth.authorize_spotify_user', user=current_user.username)  }}"><img src="https://store-images.s-microsoft.com/image/apps.46943.9007199266245148.65716085-8f7e-40af-9dd6-34b7bc30c6dd.af0b8fbf-5d63-4c74-97a9-31eefb48822b?w=180&h=180&q=60" width="60" height="60" /></a>
+
+
+        </div>
+        
+        
+        <!--Search Form here-->
+        
+        
+         <div class="col-md-12" align="center">
+            <form action="", method="post" novalidate>
+                {{ form.hidden_tag() }}
+                <p>
+                {{ form.search(size=100) }}<br>
+                </p>
+            </form>
+        </div>
+            
+      
+        <br>
+  
+    </div>
+
+</div>
 
 {% endblock %}

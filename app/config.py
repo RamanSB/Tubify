@@ -21,9 +21,11 @@ class Config():
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     #Spotify API End-points
+    SPOTIFY_SECRET_KEY = "a80afe19c09e4c68877ba539e9f5b1b8"
     SPOTIFY_CLIENT_ID = "5672cca96bb442979a52f9e5d9f2c71e"
     SPOTIFY_AUTHORIZE_ENDPOINT = "https://accounts.spotify.com/authorize"
     SPOTIFY_SEARCH_ENDPOINT = "https://api.spotify.com/v1/search"
+    SPOTIFY_TOKEN_ENDPOINT = "https://accounts.spotify.com/api/token"
     
     
     

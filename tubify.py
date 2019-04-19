@@ -10,5 +10,11 @@ context (using @app.shell_context_processor decorater)
 """
 
 from app import create_app, db
+from app.models import User, Artist, Playlist, Song, SpotifyToken
 
 app = create_app()
+
+@app.shell_context_processor
+def make_context():
+    return {'db': db, 'User': User, 'Playlist': Playlist, 'Song': Song,
+            'Artist': Artist}

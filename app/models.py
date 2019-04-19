@@ -37,6 +37,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin, current_user
 from flask import current_app
 import requests
+import math
 
 #Association table for MANY-MANY relationship between Playlist(s) and Song(s)
 playlists_songs = db.Table('playlists_songs',
@@ -81,14 +82,37 @@ class User(UserMixin, db.Model):
         print("Spotify - Search Song End Point")
         myparams = {'type':'track'}
         myparams['q']=song_name
-        response = requests.get(current_app.config['SPOTIFY_SEARCH_ENDPOINT'], params=myparams)
-        return response
+        authorization_header = {"Authorization": "Bearer {}".format(current_user.spotify_token.token)}
+        print("AuthHeader\n"+str(authorization_header))
+        response = requests.get(current_app.config['SPOTIFY_SEARCH_ENDPOINT'], params=myparams, headers=authorization_header)
+        response_body = response.json()['tracks']['items']
+        results_data = []
+        for i in range(len(response_body)):
+            track_name = response_body[i]['name']
+            artist_name = response_body[i]['album']['artists'][0]['name']
+            album_name = response_body[i]['album']['name']
+            track_length = convert_ms_to_length(int(response_body[i]['duration_ms']))
+            href = response_body[i]['href']
+            preview_url = response_body[i]['preview_url']
+            uri = response_body[i]['uri']
+
+            item_data = {'track_name':track_name,
+                         'album_name':album_name,
+                         'artist_name':artist_name,
+                         'length':track_length,
+                         'preview_url':preview_url,
+                         'uri':uri,
+                         'href':href
+                         }
+            results_data.append(item_data)
+      
+        print(len(results_data))
+        return results_data
         
     def set_spotify_access_token(self, access_token):
-        spotify_token = access_token
         st = SpotifyToken(token=access_token, token_owner=self)
         db.session.add(st)
-        db.session.add(self)
+     
         
     
     
@@ -131,3 +155,21 @@ class SpotifyToken(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     token = db.Column(db.Text)
+
+
+
+def convert_ms_to_length(duration_ms):
+    minutes = duration_ms * 0.00001666667
+    if(minutes>1):
+        noOfMins = int(minutes)
+        minFracs = minutes - noOfMins
+        noOfSecs = math.floor(minFracs * 60)
+        if(noOfSecs<10):
+            str(noOfMins)+":0"+str(noOfSecs)
+        elif(noOfSecs>60):
+           return 'x:xx'
+        else:
+            return str(noOfMins)+":"+str(noOfSecs)
+    else:
+        return "0:"+str(round(minutes*60))
+        

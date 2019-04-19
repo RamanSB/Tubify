@@ -8,8 +8,8 @@ Created on Sat Apr 13 14:19:49 2019
 
 from flask_wtf import FlaskForm
 from wtforms import TextField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Length
 
 
 class SearchSongForm(FlaskForm):
-    search = TextField('Search song', validators=[DataRequired()])
+    search = TextField('Search song', validators=[DataRequired(), Length(min=1)])

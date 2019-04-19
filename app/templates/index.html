@@ -35,8 +35,37 @@
             
       
         <br>
-  
     </div>
+    
+    
+    <div class="header"><h3>Results</h3></div>
+    <hr />
+        {% if track_data %}
+    		<table class="table table-hover">
+    			<tr>
+        			<th>Artist</th>
+        			<th>Track Name</th>
+        			<th>Album</th>
+        			<th>Length</th>
+        			<th>Add To Playlist</th>
+        			<th>Preview</th>
+    				
+    			</tr>
+    			
+            	{% for data in track_data %}
+            	<tr>
+        			<td>{{ data['artist_name'] }}</td>
+        			<td>{{ data['track_name'] }}</td>
+        			<td>{{ data['album_name'] }}</td>
+        			<td>{{ data['length'] }}</td>
+        			<!-- When user clicks + button, a modal should come up allowing to create new playlists or to chose a playlist to add a track to.-->
+        			<td> <a href="{{ url_for('main.add_to_playlist') }}"><button class="btn">+</button></a></td>
+        			<td><a href={{data['preview_url']}}>Sample</a></td>
+        		</tr>
+        		{% endfor %}
+    			
+			</table>
+			{% endif %}
 
 </div>
 

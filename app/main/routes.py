@@ -5,7 +5,7 @@ Created on Sat Apr 13 14:19:11 2019
 
 @author: RamanSB
 """
-from flask import render_template, url_for, flash, request, current_app
+from flask import render_template, url_for, flash, request, current_app, redirect
 from flask_login import current_user, login_required
 from app.main import bp
 from app import db
@@ -20,11 +20,18 @@ import requests
 @bp.route('/', methods=['GET', 'POST'])
 @login_required
 def index():
-    print('Index')
+    print('main.index')
     form = SearchSongForm()
+   
+    
+    if(form.validate_on_submit()):
+        search = form.search.data
+        results = current_user.spotify_search_song(search)
+        return render_template('index.html', title="Home", form=form, track_data=results)
+        #return(redirect(url_for('main.index')))
     
     auth_token = request.args.get('code')
-    print(auth_token)
+    print('Auth token:' + str(auth_token))
     if(auth_token is not None):
         code_payload = {
             "grant_type": "authorization_code",
@@ -41,13 +48,12 @@ def index():
         refresh_token = response_data['refresh_token']
         token_type = response_data['token_type']
         expires_in = response_data["expires_in"]
-        print("OOOOOOOOOOOOOOo\n"+access_token)
         current_user.set_spotify_access_token(access_token)
         db.session.commit()
 
-    
-    if(form.validate_on_submit()):
-        print('PLACEHOLDER')
-        
     return render_template('index.html', title="Home", form=form)
 
+
+@bp.route('/add_to_playlist', methods=['GET'])
+def add_to_playlist():
+    print()

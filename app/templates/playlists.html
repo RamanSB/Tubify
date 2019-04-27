@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block app_content %}
+     {% if current_user.playlists.all()==[] %}
+         <div class="col-lg-12" align="center"><p>You currently have no playlists, click below to create your first playlist!</p></div>
+     {% else %}
+     <h2>{{current_user.username}}'s Playlist</h2>
+     <hr>
+        {% for playlist in current_user.playlists.all() %}
+            <li> <a href=""> {{ playlist.title }} </a></li>
+        {% endfor %}
+     {% endif %}
+     
+     <div class="row" align="center">
+             <button class="btn btn-primary" data-toggle="modal" data-target="#myModal">Create New Playlist</button>
+     </div>
+    
+     <!-- Modal begins --> 
+     <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+         
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h4 class="modal-title">Enter New Playlist</h4>
+          </div>
+         
+          <div class="modal-body">
+            <!-- here we will place our flask form to create a playlist -->  
+            <form action="" method="post">
+                {{ form.hidden_tag() }}
+                <p>{{ form.playlist_name.label }}<br>
+                   {{ form.playlist_name(size=64) }}
+                   {{ form.submit() }}
+                   {% for error in form.playlist_name.errors %}
+                   <span style="color: red;">[{{error}}]</span>
+                   {% endfor %}
+                </p>
+            </form>
+          </div>
+          
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+          
+        </div>
+
+        </div>
+    </div>
+     
+{% endblock %}

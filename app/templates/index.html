@@ -59,14 +59,60 @@
         			<td>{{ data['album_name'] }}</td>
         			<td>{{ data['length'] }}</td>
         			<!-- When user clicks + button, a modal should come up allowing to create new playlists or to chose a playlist to add a track to.-->
-        			<td> <a href="{{ url_for('main.add_to_playlist') }}"><button class="btn">+</button></a></td>
-        			<td><a href={{data['preview_url']}}>Sample</a></td>
+        			<td> <button class="btn" data-toggle="modal" data-target="#addPlaylistModal">+</button></td>
+        			
+                        			
+                <!--Begin Modal-->
+                <div id="addPlaylistModal" class="modal fade", role="dialog">
+                    <div class="modal-dialog">
+                    
+                    <!--Modal Content-->
+                    <div class="modal-content">
+                    
+                    <!--Modal Header-->
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Add to Playlist</h4>
+                    </div>
+                    
+                    <!--Modal Body-->
+                    <div class="modal-body">
+                        {% if current_user.playlists.all() !=[] %}
+                            {% for playlist in current_user.playlists.all() %}
+                                  {% if data['length'] != None %}
+                                  <li><a href="{{ url_for('main.add_song_to_playlist', user=current_user.username, playlist_name=playlist.title, song_name=data['track_name'], song_url=data['href'], song_length=data['length']) }}">{{ playlist.title }}</a></li>
+                                  {% else %}
+                                  <li><a href="{{ url_for('main.add_song_to_playlist', user=current_user.username, playlist_name=playlist.title, song_name=data['track_name'], song_url=data['href']) }}">{{ playlist.title }}</a></li>
+                                  {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <p>Else block</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!--Modal Footer-->
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                    
+                    
+                    </div>
+                    </div>
+                </div>		
+                        			
+        			<td><a href={{ data['preview_url'] }}>Sample</a></td>
         		</tr>
         		{% endfor %}
     			
 			</table>
 			{% endif %}
+			
+			
+	
+			
+			
 
 </div>
+
 
 {% endblock %}

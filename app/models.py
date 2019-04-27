@@ -45,7 +45,7 @@ playlists_songs = db.Table('playlists_songs',
         db.Column('song_id', db.Integer, db.ForeignKey('song.id'), primary_key=True)
     )
 
-
+    
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(30), index=True, unique=True)
@@ -56,7 +56,7 @@ class User(UserMixin, db.Model):
     
     
     def __repr__(self):
-        return f"<User: {self.username}>"
+        return f"<User: {self.username} | Tokens:{self.spotify_token}>"
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -112,10 +112,11 @@ class User(UserMixin, db.Model):
     def set_spotify_access_token(self, access_token):
         st = SpotifyToken(token=access_token, token_owner=self)
         db.session.add(st)
-     
         
-    
-    
+    def create_playlist(self, playlist_name):
+        playlist = Playlist(title=playlist_name, user_id=self.id, creator=self)
+        db.session.add(playlist)
+     
 #Load user function (Required for: )
 @login.user_loader
 def load_user(id):
@@ -125,7 +126,8 @@ class Song(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(128), index=True)
     artist_id = db.Column(db.Integer, index=True)
-    #length = db.Column(db.) Not sure do I use datetime or just String.
+    length = db.Column(db.String(5))
+    url = db.Column(db.LargeBinary)
 
     def __repr__(self):
         return f"<Song: {self.title}>"
